@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { toast } from "@/components/ui/use-toast";
 import Header from "@/components/Header";
@@ -16,11 +15,11 @@ import { Bot } from "lucide-react";
 import { MangaItem } from "@/components/MangaCard";
 import { ReviewItem } from "@/components/ReviewCard";
 
-// Mock data for reviews to be used by both CriticsSection and CriticsPicks
+// Updated mock reviews with mangaId
 const mockReviews: ReviewItem[] = [
   {
     id: "1",
-    mangaId: "1", // Matches a manga ID in the data
+    mangaId: "1", // Ensure this matches a manga ID in the data
     author: "Anime Expert",
     authorImage: "https://randomuser.me/api/portraits/men/44.jpg",
     date: "2025-03-14",
@@ -33,7 +32,7 @@ const mockReviews: ReviewItem[] = [
   },
   {
     id: "2",
-    mangaId: "2",
+    mangaId: "2", // Added mangaId
     author: "MangaReviewer",
     authorImage: "https://randomuser.me/api/portraits/women/65.jpg", 
     date: "2025-02-28",

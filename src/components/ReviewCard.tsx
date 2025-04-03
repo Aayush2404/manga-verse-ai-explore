@@ -10,6 +10,7 @@ export type SentimentType = 'positive' | 'mixed' | 'negative';
 
 export interface ReviewItem {
   id: string;
+  mangaId: string;  // Added mangaId property here
   author: string;
   authorImage?: string;
   date: string;
