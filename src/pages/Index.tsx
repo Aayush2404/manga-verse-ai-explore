@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { toast } from "@/components/ui/use-toast";
+import { useLocation } from "react-router-dom";
 import Header from "@/components/Header";
 import TrendingSection from "@/components/TrendingSection";
 import GenreSection from "@/components/GenreSection";
@@ -15,11 +16,10 @@ import { Bot } from "lucide-react";
 import { MangaItem } from "@/components/MangaCard";
 import { ReviewItem } from "@/components/ReviewCard";
 
-// Updated mock reviews with mangaId
 const mockReviews: ReviewItem[] = [
   {
     id: "1",
-    mangaId: "1", // Ensure this matches a manga ID in the data
+    mangaId: "1",
     author: "Anime Expert",
     authorImage: "https://randomuser.me/api/portraits/men/44.jpg",
     date: "2025-03-14",
@@ -32,7 +32,7 @@ const mockReviews: ReviewItem[] = [
   },
   {
     id: "2",
-    mangaId: "2", // Added mangaId
+    mangaId: "2",
     author: "MangaReviewer",
     authorImage: "https://randomuser.me/api/portraits/women/65.jpg", 
     date: "2025-02-28",
@@ -95,6 +95,7 @@ const Index = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isAIEnabled, setIsAIEnabled] = useState(true);
   const [selectedManga, setSelectedManga] = useState<MangaItem | null>(null);
+  const location = useLocation();
   
   useEffect(() => {
     const loadMangaData = async () => {
@@ -102,11 +103,9 @@ const Index = () => {
       try {
         const data = await fetchMangaData();
         setMangaList(data);
-        // Set a default selected manga for the critics section
         setSelectedManga(data.find(manga => manga.isTrending) || data[0]);
       } catch (error) {
         console.error("Error fetching manga data:", error);
-        // Fallback to mock data if the API fails
         setMangaList(mockMangaData);
         setSelectedManga(mockMangaData.find(manga => manga.isTrending) || mockMangaData[0]);
         toast({
@@ -121,6 +120,21 @@ const Index = () => {
     
     loadMangaData();
   }, []);
+
+  useEffect(() => {
+    if (location.state && location.state.scrollTo) {
+      const sectionId = location.state.scrollTo;
+      setTimeout(() => {
+        const element = document.getElementById(sectionId);
+        if (element) {
+          element.scrollIntoView({ 
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }
+      }, 500);
+    }
+  }, [location.state, isLoading]);
   
   const toggleAIAssistant = () => {
     setIsAIEnabled(!isAIEnabled);
@@ -132,10 +146,8 @@ const Index = () => {
     });
   };
 
-  // Assign manga IDs to reviews if they don't already have them
   const processedReviews = mockReviews.map(review => {
     if (!review.mangaId && mangaList.length > 0) {
-      // Randomly assign a manga if no manga ID is provided
       const randomManga = mangaList[Math.floor(Math.random() * mangaList.length)];
       return { ...review, mangaId: randomManga.id };
     }
@@ -147,7 +159,6 @@ const Index = () => {
       <Header />
       
       <main>
-        {/* Hero Section */}
         <section className="py-12 md:py-20 relative overflow-hidden">
           <div className="absolute inset-0 z-0 bg-manga-dark">
             <div className="absolute inset-0 bg-gradient-to-b from-manga-primary/10 to-background opacity-70"></div>
@@ -180,32 +191,29 @@ const Index = () => {
         </section>
         
         {isLoading ? (
-          // Loading state
           <div className="py-20 text-center">
             <div className="w-16 h-16 border-4 border-t-manga-primary border-r-manga-primary border-b-transparent border-l-transparent rounded-full animate-spin mx-auto mb-4"></div>
             <p className="text-muted-foreground">Loading the best manga for you...</p>
           </div>
         ) : (
-          // Content sections
-          <>
-            <TrendingSection mangaList={mangaList} />
-            <GenreSection mangaList={mangaList} />
+          <div className="space-y-8 md:space-y-12">
             <CriticsPicks 
               mangaList={mangaList} 
               reviews={processedReviews} 
               isAIEnabled={isAIEnabled} 
             />
+            <TrendingSection mangaList={mangaList} />
+            <GenreSection mangaList={mangaList} />
             <SurpriseSection mangaList={mangaList} />
             {selectedManga && (
               <CriticsSection manga={selectedManga} isAIEnabled={isAIEnabled} />
             )}
-          </>
+          </div>
         )}
       </main>
       
       <Footer />
       
-      {/* Toggleable AI Assistant */}
       <AIAssistant isEnabled={isAIEnabled} toggleAssistant={toggleAIAssistant} />
     </div>
   );

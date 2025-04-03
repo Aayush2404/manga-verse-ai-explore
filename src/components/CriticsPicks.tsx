@@ -37,6 +37,14 @@ interface CriticsPicksProps {
   isAIEnabled: boolean;
 }
 
+interface MangaWithScores extends MangaItem {
+  criticScore: number;
+  userScore: number;
+  balancedScore: number;
+  featuredReview: ReviewItem | null;
+  hasReviews: boolean;
+}
+
 const CriticsPicks = ({ mangaList, reviews, isAIEnabled }: CriticsPicksProps) => {
   const [sortBy, setSortBy] = useState<SortOption>('critics');
   
@@ -79,7 +87,7 @@ const CriticsPicks = ({ mangaList, reviews, isAIEnabled }: CriticsPicksProps) =>
         balancedScore,
         featuredReview,
         hasReviews: mangaReviews.length > 0
-      };
+      } as MangaWithScores;
     });
   }, [mangaList, reviews]);
   
@@ -105,7 +113,7 @@ const CriticsPicks = ({ mangaList, reviews, isAIEnabled }: CriticsPicksProps) =>
   }, [topPicks, sortBy]);
   
   // Generate AI insights
-  const generateInsights = (manga: MangaItem & { criticScore: number, userScore: number }) => {
+  const generateInsights = (manga: MangaWithScores) => {
     if (!isAIEnabled) return null;
     
     // This would normally be an actual AI-generated insight
@@ -157,7 +165,7 @@ const CriticsPicks = ({ mangaList, reviews, isAIEnabled }: CriticsPicksProps) =>
         </div>
         
         {sortedPicks.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 animate-fade-in">
             {sortedPicks.map((manga) => (
               <Card key={manga.id} className="overflow-hidden border shadow-sm transition-all hover:shadow-md">
                 <div className="grid grid-cols-3 h-full">
@@ -224,7 +232,7 @@ const CriticsPicks = ({ mangaList, reviews, isAIEnabled }: CriticsPicksProps) =>
                           <div className="flex items-start mt-1">
                             <MessageSquare className="h-4 w-4 text-muted-foreground mr-1 mt-0.5 flex-shrink-0" />
                             <p className="text-sm line-clamp-2 text-muted-foreground">
-                              {generateInsights(manga as any)}
+                              {generateInsights(manga)}
                             </p>
                           </div>
                         )

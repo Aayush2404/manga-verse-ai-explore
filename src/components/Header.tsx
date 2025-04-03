@@ -7,12 +7,36 @@ import {
   Menu, 
   X,
   User,
-  BookOpen
+  BookOpen,
+  Award
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState<string | null>(null);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const scrollToSection = (sectionId: string) => {
+    setActiveSection(sectionId);
+    setIsMenuOpen(false);
+    
+    const element = document.getElementById(sectionId);
+    if (element) {
+      // If not on the home page, navigate there first
+      if (location.pathname !== '/') {
+        navigate('/', { state: { scrollTo: sectionId } });
+        return;
+      }
+      
+      element.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full backdrop-blur-md bg-background/80 border-b border-border">
@@ -25,15 +49,43 @@ const Header = () => {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-6">
-          <a href="#trending" className="text-foreground/80 hover:text-primary transition-colors">
+          <button 
+            onClick={() => scrollToSection('trending')}
+            className={cn(
+              "text-foreground/80 hover:text-primary transition-colors relative after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:origin-bottom-right after:scale-x-0 after:bg-manga-primary after:transition-transform after:duration-300 hover:after:origin-bottom-left hover:after:scale-x-100",
+              activeSection === 'trending' && "text-manga-primary font-medium after:scale-x-100 after:origin-bottom-left"
+            )}
+          >
             Trending
-          </a>
-          <a href="#genres" className="text-foreground/80 hover:text-primary transition-colors">
+          </button>
+          <button
+            onClick={() => scrollToSection('critics-picks')}
+            className={cn(
+              "text-foreground/80 hover:text-primary transition-colors relative after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:origin-bottom-right after:scale-x-0 after:bg-manga-primary after:transition-transform after:duration-300 hover:after:origin-bottom-left hover:after:scale-x-100",
+              activeSection === 'critics-picks' && "text-manga-primary font-medium after:scale-x-100 after:origin-bottom-left"
+            )}
+          >
+            <Award className="w-4 h-4 inline-flex mr-1" />
+            Critics' Picks
+          </button>
+          <button 
+            onClick={() => scrollToSection('genres')}
+            className={cn(
+              "text-foreground/80 hover:text-primary transition-colors relative after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:origin-bottom-right after:scale-x-0 after:bg-manga-primary after:transition-transform after:duration-300 hover:after:origin-bottom-left hover:after:scale-x-100",
+              activeSection === 'genres' && "text-manga-primary font-medium after:scale-x-100 after:origin-bottom-left"
+            )}
+          >
             Genres
-          </a>
-          <a href="#surprise" className="text-foreground/80 hover:text-primary transition-colors">
+          </button>
+          <button 
+            onClick={() => scrollToSection('surprise')}
+            className={cn(
+              "text-foreground/80 hover:text-primary transition-colors relative after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:origin-bottom-right after:scale-x-0 after:bg-manga-primary after:transition-transform after:duration-300 hover:after:origin-bottom-left hover:after:scale-x-100",
+              activeSection === 'surprise' && "text-manga-primary font-medium after:scale-x-100 after:origin-bottom-left"
+            )}
+          >
             Surprise Me
-          </a>
+          </button>
         </nav>
 
         {/* Desktop Actions */}
@@ -65,27 +117,43 @@ const Header = () => {
           isMenuOpen ? "translate-x-0" : "translate-x-full"
         )}>
           <nav className="flex flex-col p-6 gap-6">
-            <a 
-              href="#trending" 
-              className="text-foreground/80 hover:text-primary transition-colors py-2"
-              onClick={() => setIsMenuOpen(false)}
+            <button 
+              className={cn(
+                "text-left text-foreground/80 hover:text-primary transition-colors py-2",
+                activeSection === 'trending' && "text-manga-primary font-medium"
+              )}
+              onClick={() => scrollToSection('trending')}
             >
               Trending
-            </a>
-            <a 
-              href="#genres" 
-              className="text-foreground/80 hover:text-primary transition-colors py-2"
-              onClick={() => setIsMenuOpen(false)}
+            </button>
+            <button
+              className={cn(
+                "text-left flex items-center gap-2 text-foreground/80 hover:text-primary transition-colors py-2",
+                activeSection === 'critics-picks' && "text-manga-primary font-medium"
+              )}
+              onClick={() => scrollToSection('critics-picks')}
+            >
+              <Award className="w-4 h-4" />
+              Critics' Picks
+            </button>
+            <button 
+              className={cn(
+                "text-left text-foreground/80 hover:text-primary transition-colors py-2",
+                activeSection === 'genres' && "text-manga-primary font-medium"
+              )}
+              onClick={() => scrollToSection('genres')}
             >
               Genres
-            </a>
-            <a 
-              href="#surprise" 
-              className="text-foreground/80 hover:text-primary transition-colors py-2"
-              onClick={() => setIsMenuOpen(false)}
+            </button>
+            <button 
+              className={cn(
+                "text-left text-foreground/80 hover:text-primary transition-colors py-2",
+                activeSection === 'surprise' && "text-manga-primary font-medium"
+              )}
+              onClick={() => scrollToSection('surprise')}
             >
               Surprise Me
-            </a>
+            </button>
             <Button 
               variant="outline" 
               className="flex items-center justify-start gap-2 mt-4"
