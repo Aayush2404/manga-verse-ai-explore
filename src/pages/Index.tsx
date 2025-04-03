@@ -5,6 +5,7 @@ import Header from "@/components/Header";
 import TrendingSection from "@/components/TrendingSection";
 import GenreSection from "@/components/GenreSection";
 import SurpriseSection from "@/components/SurpriseSection";
+import CriticsSection from "@/components/CriticsSection";
 import AIAssistant from "@/components/AIAssistant";
 import Footer from "@/components/Footer";
 import { fetchMangaData, mockMangaData } from "@/data/mockData";
@@ -17,6 +18,7 @@ const Index = () => {
   const [mangaList, setMangaList] = useState<MangaItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isAIEnabled, setIsAIEnabled] = useState(true);
+  const [selectedManga, setSelectedManga] = useState<MangaItem | null>(null);
   
   useEffect(() => {
     const loadMangaData = async () => {
@@ -24,10 +26,13 @@ const Index = () => {
       try {
         const data = await fetchMangaData();
         setMangaList(data);
+        // Set a default selected manga for the critics section
+        setSelectedManga(data.find(manga => manga.isTrending) || data[0]);
       } catch (error) {
         console.error("Error fetching manga data:", error);
         // Fallback to mock data if the API fails
         setMangaList(mockMangaData);
+        setSelectedManga(mockMangaData.find(manga => manga.isTrending) || mockMangaData[0]);
         toast({
           title: "Using fallback data",
           description: "We're having trouble connecting to our servers. Showing offline content instead.",
@@ -100,6 +105,9 @@ const Index = () => {
             <TrendingSection mangaList={mangaList} />
             <GenreSection mangaList={mangaList} />
             <SurpriseSection mangaList={mangaList} />
+            {selectedManga && (
+              <CriticsSection manga={selectedManga} isAIEnabled={isAIEnabled} />
+            )}
           </>
         )}
       </main>
